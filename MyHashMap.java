@@ -40,11 +40,6 @@ public class MyHashMap<K, V> {
                this.next = null;
           }
 
-          @Override
-          public String toString() {
-               return key + " : " + value;
-          }
-
           public K getKey() {
                return this.key;
           }
@@ -56,6 +51,11 @@ public class MyHashMap<K, V> {
           public void setValue(V value) {
                this.value = value;
           }
+
+          @Override
+          public String toString() {
+               return key + " : " + value;
+          }
      }
 
      private static class NullKeyException extends RuntimeException {
@@ -63,6 +63,9 @@ public class MyHashMap<K, V> {
                super("Null Key is Not Allowed!");
           }
      }
+
+
+
 
      private int getIndex(K key) {
           return (key.hashCode() & Integer.MAX_VALUE) % capacity;
@@ -90,8 +93,7 @@ public class MyHashMap<K, V> {
           }
      }
 
-     public void put(K key, V val) {
-
+     public V put(K key, V val) {
           if(count >= threshold){
                resize();
           }
@@ -107,7 +109,7 @@ public class MyHashMap<K, V> {
           while (currentNode != null) {
                if (currentNode.getKey().equals(key)) {
                     currentNode.setValue(val);
-                    return;
+                    return currentNode.getValue();
                }
 
                currentNode = currentNode.next;
@@ -117,6 +119,35 @@ public class MyHashMap<K, V> {
           newNode.next = arr;
           bucket[index] = newNode;
           count++;
+
+          return newNode.getValue();
+     }
+
+     public V putIfAbsent(K key, V val){
+          if(count >= threshold){
+               resize();
+          }
+
+          checkNullKey(key);
+
+          int index = getIndex(key);
+
+          Node<K, V> arr = bucket[index];
+          Node<K, V> currentNode = arr;
+
+          while (currentNode != null) {
+               if(currentNode.getKey().equals(key)){
+                    return null;
+               }
+
+               currentNode = currentNode.next;
+          }
+
+          Node<K, V> newNode = new Node<K, V>(key, val);
+          newNode.next = arr;
+          bucket[index] = newNode;
+          count++;
+          return newNode.getValue();
      }
 
      public V replace(K key, V val){
@@ -270,7 +301,7 @@ public class MyHashMap<K, V> {
           String res = "";
           res += "capacity = " + capacity + ", count = " + count + "\n";
 
-          
+
           for (int i = 0; i < bucket.length; i++) {
                res += "bucket[" + i + "] = ";
                Node<K, V> node = bucket[i];
