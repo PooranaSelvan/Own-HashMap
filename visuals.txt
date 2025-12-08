@@ -1,0 +1,38 @@
+---------- Internal Bucket Structure ----------
+0: null  
+1: null  
+2: (orange,7)  
+3: null  
+4: null  
+5: (apple,10) → (banana,20)  
+6: null  
+7: null
+
+
+---------- How it Is storing in Bucket
+bucket[1] → [ ]
+bucket[1] → [ ("cat" : 5) ]
+bucket[1] → [ ("cat" : 5) → ("dog" : 9) ] // Each () is a Entry with key-value pairs
+
+
+---------- How to Get the Value From Bucket
+map.get("dog");
+bucket[1] → [ ("cat":5) → ("dog":9) ]
+("cat" : 5) NO MATCH
+("dog" : 9) MATCH → return 9
+
+
+---------- Put Method
+bucket[index] --> ("B", 20) --> ("A", 10) --> null
+head = ("A", 10) // head node
+so when we add it here head will be newNode and these will be its next node.
+newNode = ("C", 30)
+bucket[index] --> ("C", 30) --> ("B", 20) --> ("A", 10) --> null
+                                   prev          head
+
+---------- Get Method
+get the head node using its index. If null return null else iterate and find with key and return 
+
+
+----- Internal Architecture Image -----
+https://imgs.search.brave.com/9XZfDJ1PwBC4b16F9XX9Xzqeju7fmSsvgdY6Zi2xiJE/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ob3d0/b2RvaW5qYXZhLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/Mi8xMS9IYXNoTWFw/LWludGVybmFsbHkt/dXNlcy1SZWQtQmxh/Y2stVHJlZS0xLnBu/Zw
