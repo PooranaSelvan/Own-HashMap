@@ -10,35 +10,36 @@ class Main {
           System.out.println("Put B: " + map.put("B", 2));
           System.out.println("PutIfAbsent B: " + map.putIfAbsent("B", 20));
           System.out.println("PutIfAbsent C: " + map.putIfAbsent("C", 3));
+          System.out.println();
           System.out.println("After Put : \n"+map);
 
 
 
-          // Replace
-          System.out.println("Replace A with 10: " + map.replace("A", 10));
-          System.out.println("After Replaced : \n"+map);
+          // // Replace
+          // System.out.println("Replace A with 10: " + map.replace("A", 10));
+          // System.out.println("After Replaced : \n"+map);
 
 
-          // Remove
-          System.out.println("Remove B: " + map.remove("B"));
-          System.out.println("Check B is Removed : "+ map.get("B"));
-          System.out.println("After Removed : \n"+map);
+          // // Remove
+          // System.out.println("Remove B: " + map.remove("B"));
+          // System.out.println("Check B is Removed : "+ map.get("B"));
+          // System.out.println("After Removed : \n"+map);
 
 
-          // Get
-          System.out.println("Get A: " + map.get("A"));
-          System.out.println("Get B: " + map.get("B"));
+          // // Get
+          // System.out.println("Get A: " + map.get("A"));
+          // System.out.println("Get B: " + map.get("B"));
 
-          // Clone
-          MyHashMap<String, Integer> clonedMap = map.clone();
-          System.out.println("Cloned map: " + clonedMap);
+          // // Clone
+          // MyHashMap<String, Integer> clonedMap = map.clone();
+          // System.out.println("Cloned map: " + clonedMap);
 
 
-          System.out.println("Size: " + map.size());
-          System.out.println("Is empty? " + map.isEmpty());
+          // System.out.println("Size: " + map.size());
+          // System.out.println("Is empty? " + map.isEmpty());
   
-          // clear()
-          map.clear();
-          System.out.println("After clear: " + map);
+          // // clear()
+          // map.clear();
+          // System.out.println("After clear: " + map);
      }
 }

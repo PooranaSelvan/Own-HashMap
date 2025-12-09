@@ -1,7 +1,8 @@
 import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+// import java.util.HashMap;
+import java.util.Map;
 
 public class MyHashMap<K, V> {
      int capacity;
@@ -78,8 +79,16 @@ public class MyHashMap<K, V> {
      }
 
      public void resize(){
+          if (capacity >= MAXIMUM_CAPACITY) {
+               return; 
+          }
+       
           capacity *= 2;
           threshold = (int)(capacity * loadFactor);
+
+          if (capacity > MAXIMUM_CAPACITY) {
+               capacity = MAXIMUM_CAPACITY;
+          }
 
           Node<K, V>[] oldBucket = bucket;
           bucket = new Node[capacity];
@@ -148,6 +157,16 @@ public class MyHashMap<K, V> {
           bucket[index] = newNode;
           count++;
           return newNode.getValue();
+     }
+
+     public void putAll(Map<? extends K, ? extends V> m) {
+          if(m == null){
+               return;
+          }
+
+          for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
+               put(entry.getKey(), entry.getValue());
+          }
      }
 
      public V replace(K key, V val){
@@ -302,15 +321,18 @@ public class MyHashMap<K, V> {
           res += "capacity = " + capacity + ", count = " + count + "\n";
 
 
+          res += "[";
           for (int i = 0; i < bucket.length; i++) {
-               res += "bucket[" + i + "] = ";
                Node<K, V> node = bucket[i];
 
                if (node == null) {
-                    res += "null\n";
+                    res += "null";
+                    if(i < bucket.length - 1){
+                         res += ", ";
+                    }
                } else {
                     while (node != null) {
-                         res += node.key + " : " + node.value;
+                         res += node.key + " : " + node.value + ", ";
 
                          node = node.next;
 
@@ -318,10 +340,9 @@ public class MyHashMap<K, V> {
                               res += " -> ";
                          }
                     }
-                    res += "\n";
                }
           }
-
+          res += "]";
           return res;
      }
 }
