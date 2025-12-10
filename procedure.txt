@@ -1,2 +1,0 @@
-1. to calculate threshold we use capacity * loadfactor
-if the arraySize > threshold we should resize the array using the above method
