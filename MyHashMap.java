@@ -1,6 +1,7 @@
 import java.lang.RuntimeException;
 import java.util.ArrayList;
 import java.util.Collection;
+// import java.util.HashSet;
 // import java.util.HashMap;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ public class MyHashMap<K, V> {
      int threshold;
      int count = 0;
      static final int MAXIMUM_CAPACITY = 1073741824;
-
+     // threshold = 16 × 0.75 = 12 
      Node<K, V>[] bucket;
 
 
@@ -66,6 +67,11 @@ public class MyHashMap<K, V> {
      }
 
 
+     private static class SizeException extends RuntimeException {
+          SizeException(){
+               super("Size Exceeded!");
+          }
+     }
 
 
      private int getIndex(K key) {
@@ -78,9 +84,9 @@ public class MyHashMap<K, V> {
           }
      }
 
-     public void resize(){
+     private void resize(){
           if (capacity >= MAXIMUM_CAPACITY) {
-               return; 
+               throw new SizeException();
           }
        
           capacity *= 2;
@@ -94,7 +100,7 @@ public class MyHashMap<K, V> {
           bucket = new Node[capacity];
           count = 0;
 
-          for (Node<K,V> node : oldBucket) {
+          for (Node<K, V> node : oldBucket) {
                while (node != null) {
                     put(node.getKey(), node.getValue());
                     node = node.next;
@@ -103,37 +109,46 @@ public class MyHashMap<K, V> {
      }
 
      public V put(K key, V val) {
-          if(count >= threshold){
-               resize();
-          }
-
-          checkNullKey(key);
-
-          int index = getIndex(key);
-          // System.out.println("Bucket Index : "+index);
-
-          Node<K, V> arr = bucket[index]; // head node
-          Node<K, V> currentNode = arr; // copy ^
-
-          while (currentNode != null) {
-               if (currentNode.getKey().equals(key)) {
-                    currentNode.setValue(val);
-                    return currentNode.getValue();
+          if(capacity > MAXIMUM_CAPACITY){
+               throw new SizeException();
+          } else {
+               if((count + 1) > threshold){
+                    resize();
                }
-
-               currentNode = currentNode.next;
+     
+               checkNullKey(key);
+     
+               int index = getIndex(key);
+               // System.out.println("Bucket Index : "+index);
+     
+               Node<K, V> arr = bucket[index]; // head node
+               Node<K, V> currentNode = arr; // copy ^
+     
+               while (currentNode != null) {
+                    if (currentNode.getKey().equals(key)) {
+                         currentNode.setValue(val);
+                         return currentNode.getValue();
+                    }
+     
+                    currentNode = currentNode.next;
+               }
+     
+               Node<K, V> newNode = new Node<>(key, val);
+               newNode.next = arr;
+               bucket[index] = newNode;
+               count++;
+     
+               return newNode.getValue();
           }
-
-          Node<K, V> newNode = new Node<>(key, val);
-          newNode.next = arr;
-          bucket[index] = newNode;
-          count++;
-
-          return newNode.getValue();
      }
 
      public V putIfAbsent(K key, V val){
-          if(count >= threshold){
+          if (capacity > MAXIMUM_CAPACITY) {
+               throw new SizeException();
+          }
+           
+
+          if((count + 1) > threshold){
                resize();
           }
 
@@ -159,13 +174,17 @@ public class MyHashMap<K, V> {
           return newNode.getValue();
      }
 
-     public void putAll(Map<? extends K, ? extends V> m) {
-          if(m == null){
+     public void putAll(Map<? extends K, ? extends V> map) {
+          if(map == null){
                return;
           }
 
-          for (Map.Entry<? extends K, ? extends V> entry : m.entrySet()) {
-               put(entry.getKey(), entry.getValue());
+          if(capacity > MAXIMUM_CAPACITY){
+               throw new SizeException();
+          }
+
+          for (Map.Entry<? extends K, ? extends V> e : map.entrySet()) {
+               put(e.getKey(), e.getValue());
           }
      }
 
@@ -188,6 +207,25 @@ public class MyHashMap<K, V> {
           }
 
           return null;
+     }
+
+     public boolean replace(K key, V oldVal, V newVal){
+          checkNullKey(key);
+
+          int index = getIndex(key);
+
+          Node<K, V> arr = bucket[index];
+          Node<K, V> currentNode = arr;
+
+          while (currentNode != null) {
+               if(currentNode.getKey().equals(key) && currentNode.getValue().equals(oldVal)){
+                    return true;
+               }
+
+               currentNode = currentNode.next;
+          }
+
+          return false;
      }
 
      public V get(K key) {
@@ -235,6 +273,32 @@ public class MyHashMap<K, V> {
           return null;
      }
 
+     public V remove(K key, V val) {
+          checkNullKey(key);
+
+          int index = getIndex(key);
+
+          Node<K, V> head = bucket[index];
+          Node<K, V> prev = null;
+
+          while (head != null) {
+               if (head.getKey().equals(key) && head.getValue().equals(val)) {
+                    if (prev != null) {
+                         prev.next = head.next;
+                    } else {
+                         bucket[index] = head.next;
+                    }
+                    count--;
+                    return head.getValue();
+               }
+
+               prev = head;
+               head = head.next;
+          }
+
+          return null;
+     }
+
      public Collection<V> values(){
           Collection<V> res = new ArrayList<>();
 
@@ -248,6 +312,19 @@ public class MyHashMap<K, V> {
           }
 
           return res;
+     }
+
+     public MyHashSet<K> keySet(){
+          MyHashSet<K> hashSet = new MyHashSet<>();
+
+          for (Node<K, V> node : bucket) {
+               while (node != null) {
+                    hashSet.add(node.getKey());
+                    node = node.next;
+               }
+          }
+
+          return hashSet;
      }
 
      public boolean containsKey(K key){
