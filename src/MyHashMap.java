@@ -15,12 +15,14 @@ public class MyHashMap<K, V> {
     Node<K, V>[] bucket;
 
 
+    @SuppressWarnings("unchecked")
     MyHashMap() {
         this.capacity = 16;
         bucket = new Node[capacity];
         this.threshold = (int) (capacity * loadFactor);
     }
 
+    @SuppressWarnings("unchecked")
     MyHashMap(int capacity) {
         if (capacity <= 0) {
             throw new NullPointerException();
@@ -31,6 +33,7 @@ public class MyHashMap<K, V> {
         this.threshold = (int) (capacity * loadFactor);
     }
 
+    @SuppressWarnings("hiding")
     private class Node<K, V> {
         K key;
         V value;
@@ -84,6 +87,7 @@ public class MyHashMap<K, V> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void resize(){
         if (capacity >= MAXIMUM_CAPACITY) {
             throw new SizeException();
@@ -219,6 +223,7 @@ public class MyHashMap<K, V> {
 
         while (currentNode != null) {
             if(currentNode.getKey().equals(key) && currentNode.getValue().equals(oldVal)){
+                currentNode.setValue(newVal);
                 return true;
             }
 
@@ -302,8 +307,8 @@ public class MyHashMap<K, V> {
     public Collection<V> values(){
         Collection<V> res = new ArrayList<>();
 
-        for (int i = 0; i < bucket.length; i++) {
-            Node<K, V> node = bucket[i];
+        for (Node<K, V> kvNode : bucket) {
+            Node<K, V> node = kvNode;
 
             while (node != null) {
                 res.add(node.getValue());
@@ -347,11 +352,11 @@ public class MyHashMap<K, V> {
 
     public boolean containsValue(V val){
 
-        for(int i = 0; i < bucket.length; i++){
-            Node<K, V> node = bucket[i];
+        for (Node<K, V> kvNode : bucket) {
+            Node<K, V> node = kvNode;
 
             while (node != null) {
-                if(node.getValue().equals(val)){
+                if (node.getValue().equals(val)) {
                     return true;
                 }
 
@@ -365,8 +370,8 @@ public class MyHashMap<K, V> {
     public MyHashMap<K, V> clone(){
         MyHashMap<K, V> newMap = new MyHashMap<>(capacity);
 
-        for(int i = 0; i < bucket.length; i++){
-            Node<K, V> node = bucket[i];
+        for (Node<K, V> kvNode : bucket) {
+            Node<K, V> node = kvNode;
 
             while (node != null) {
                 newMap.put(node.getKey(), node.getValue());
@@ -377,6 +382,7 @@ public class MyHashMap<K, V> {
         return newMap;
     }
 
+    @SuppressWarnings("unchecked")
     public void clear(){
         capacity = 16;
         bucket = new Node[capacity];

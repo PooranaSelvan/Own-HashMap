@@ -8,15 +8,18 @@ public class MyHashSet<K> implements Iterable<K>{
 
 
     Node<K>[] bucket;
+    @SuppressWarnings("rawtypes")
     MyHashMap myhashMap = new MyHashMap<>();
 
 
+    @SuppressWarnings("unchecked")
     MyHashSet(){
         this.capacity = 16;
         bucket = new Node[capacity];
         this.threshold = (int) (capacity * loadFactor);
     }
 
+    @SuppressWarnings("hiding")
     private class Node<K> {
         K key;
         Node<K> next;
@@ -51,6 +54,7 @@ public class MyHashSet<K> implements Iterable<K>{
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void resize(){
         capacity *= 2;
         threshold = (int)(capacity * loadFactor);
