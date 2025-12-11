@@ -123,6 +123,10 @@ public class MyHashSet<K> implements Iterable<K>{
         };
     }
 
+    public boolean isEmpty(){
+        return size == 0;
+    }
+
     @Override
     public String toString(){
         String res = "";

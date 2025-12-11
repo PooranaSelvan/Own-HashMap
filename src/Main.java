@@ -1,9 +1,6 @@
 // import java.util.HashMap;
 // import java.util.Iterator;
-import javax.print.Doc;
-import java.util.InputMismatchException;
-import java.util.PriorityQueue;
-import java.util.Scanner;
+import java.util.*;
 
 
 class Main {
@@ -12,81 +9,110 @@ class Main {
         Hospital hos = new Hospital();
 
         int userChoice = 0;
-        int doctorCount = 0;
-        int patientCount = 0;
 
-        while(true){
-            try {
-                System.out.print("How Many Doctors You want to Add ? : ");
-                doctorCount = input.nextInt();
+        while (userChoice != 5){
+            System.out.println("---------- Hospital Management Menu -------");
+            System.out.print("1. Add Doctor\n2. Add Patient\n3. Show all Doctors and their Patients\n4. Severe Patients\n5. Exit\nEnter your Choice : ");
+            userChoice = input.nextInt();
+            input.nextLine();
 
-                break;
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid Input!");
-                System.out.println();
+            switch (userChoice){
+                case  1:
+                    addNewDoctor(hos);
+                    break;
+                case 2:
+                    addNewPatient(hos);
+                    break;
+                case 3:
+                    showAllDoctorsNPatients(hos);
+                    break;
+                case 4:
+                    showSeverePatients(hos);
+                    break;
+                case 5:
+                    System.out.println("\n----------\nThank you for Visiting!\n----------\n");
+                    break;
+                default:
+                    System.out.println("\nEnter the Valid Choice!\n");
             }
         }
-        input.nextLine();
+    }
 
-        for(int i = 0; i < doctorCount; i++){
-            System.out.print("Enter the Doctor Name : ");
-            String doctorName = input.nextLine();
+    public static void addNewDoctor(Hospital hos){
+        System.out.println();
+        System.out.print("Enter the Doctor Name : ");
+        String doctorName = input.nextLine();
 
-            System.out.print("Enter the Specialist of the Doctor : ");
-            String specialist = input.nextLine();
+        System.out.print("Enter the Specialist of the Doctor : ");
+        String specialist = input.nextLine();
 
-            Doctor d = new Doctor(doctorName, specialist);
-            hos.addDoctor(d);
+        hos.addDoctor(new Doctor(doctorName, specialist));
 
-            System.out.println(doctorName+" has been Successfully Added as Doctor!");
+        System.out.println(doctorName+" has been Successfully Added as Doctor!");
+        System.out.println();
+    }
+
+    public static void addNewPatient(Hospital hos){
+        System.out.println();
+        if (hos.list.keySet().isEmpty()) {
+            System.out.println("No doctors! Add doctor to Add Patient.");
             System.out.println();
+            return;
         }
 
-        while (true){
-            try{
-                System.out.print("How Many Patients You want to Add ? : ");
-                patientCount = input.nextInt();
+        System.out.print("Enter Patient Name : ");
+        String name = input.nextLine();
 
-                break;
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid Input!");
-            }
-        }
+        System.out.print("Enter Patient Age : ");
+        int age = input.nextInt();
         input.nextLine();
 
+        System.out.print("Enter Patient Disease : ");
+        String disease = input.nextLine();
 
-        for(int i = 0; i < patientCount; i++){
-            System.out.print("Enter Patient Name : ");
-            String name = input.nextLine();
+        System.out.print("Enter Priority (Priority Level : 1 = highest, 2 = medium, 3 = lowest) : ");
+        int priority = input.nextInt();
+        input.nextLine();
 
-            System.out.print("Enter Patient Age : ");
-            int age = input.nextInt();
-            input.nextLine();
+        System.out.println("Choose Your Doctor : ");
+        hos.showDoctors();
 
-            System.out.print("Enter Patient Disease : ");
-            String disease = input.nextLine();
+        System.out.print("Enter the Doctor Id to Choose : ");
+        int docId = input.nextInt();
+        input.nextLine();
 
-            System.out.print("Enter Priority (Priority Level : 1 = highest, 2 = medium, 3 = lowest) : ");
-            int priority = input.nextInt();
-            input.nextLine();
+        Doctor doc = hos.getDoctor(docId);
 
-            System.out.println("Choose Your Doctor : ");
-            hos.showDoctors();
+        if(doc != null){
+            hos.addPatient(doc, new Patient(name, age, disease, priority));
+            System.out.println("Patient Added Successfully!");
+        } else {
+            System.out.println("Doctor Not Found!");
+        }
+        System.out.println();
+    }
 
-            System.out.print("Enter the Doctor Id to Choose : ");
-            int docId = input.nextInt();
-            input.nextLine();
+    public static void showSeverePatients(Hospital hos){
+        System.out.println("\nSevere Patients : ");
 
-            Doctor doc = hos.getDoctor(docId);
+        PriorityQueue<Patient> patients = new PriorityQueue<>(new PatientComparator().thenComparing(new NameComparator()));
 
-            if(doc != null){
-                hos.addPatient(doc, new Patient(name, age, disease, priority));
-                System.out.println("Patient Added Successfully!");
-            } else {
-                System.out.println("Doctor Not Found!");
+        for (Doctor d : hos.list.keySet()){
+            PriorityQueue<Patient> patientQueue = hos.getPatients(d);
+
+            while (!patientQueue.isEmpty()){
+                patients.add(patientQueue.poll());
             }
         }
 
+        for (Patient p : patients){
+            System.out.println(p);
+        }
+
+        System.out.println();
+    }
+
+    public static void showAllDoctorsNPatients(Hospital hos){
         System.out.println("All Doctor & Patients : ");
 
         for(Doctor d : hos.list.keySet()){
@@ -99,5 +125,6 @@ class Main {
             }
             System.out.println();
         }
+        System.out.println();
     }
 }
