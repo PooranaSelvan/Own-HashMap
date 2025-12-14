@@ -1,5 +1,6 @@
 // import java.util.HashMap;
 // import java.util.Iterator;
+import java.sql.SQLException;
 import java.util.*;
 
 
@@ -8,7 +9,7 @@ class Main {
     static String cyanColor = "\u001B[96m";
     static String resetColor = "\u001B[0m";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         Hospital hos = new Hospital();
 
 
@@ -62,7 +63,7 @@ class Main {
         }
     }
 
-    public static void addNewDoctor(Hospital hos){
+    public static void addNewDoctor(Hospital hos) throws SQLException {
         System.out.println();
         System.out.print("Enter the Doctor Name : ");
         String doctorName = input.nextLine();
@@ -77,7 +78,7 @@ class Main {
         System.out.println();
     }
 
-    public static void addNewPatient(Hospital hos){
+    public static void addNewPatient(Hospital hos) throws SQLException {
         System.out.println();
         if (hos.list.keySet().isEmpty()) {
             System.out.println("No doctors! Add doctor to Add Patient.");

@@ -8,18 +8,18 @@ public class Hospital {
     MyHashMap<Doctor, PriorityQueue<Patient>> list = new MyHashMap<>();
     Connection con = DBConnection.makeConnection();
 
-    Hospital(){
+    Hospital() throws SQLException {
         loadDoctorsFromDb();
         loadPatientsFromDb();
     }
 
-    public void addDoctor(Doctor d){
+    public void addDoctor(Doctor d) throws SQLException {
         saveDoctorToDb(d);
 
         list.put(d, new PriorityQueue<>(new PatientComparator().thenComparing(new NameComparator())));
     }
 
-    public void addPatient(Doctor d, Patient p){
+    public void addPatient(Doctor d, Patient p) throws SQLException {
         PriorityQueue<Patient> patientList = list.get(d);
 
         if(patientList != null){
@@ -49,12 +49,12 @@ public class Hospital {
     }
 
 
-    public void loadDoctorsFromDb() {
+    public void loadDoctorsFromDb() throws SQLException {
         String query = "select * from doctors";
 
         try {
             PreparedStatement preparedStatement = con.prepareStatement(query);
-
+            con.setAutoCommit(false);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()){
@@ -63,12 +63,15 @@ public class Hospital {
 
                 list.put(d, new PriorityQueue<>(new PatientComparator().thenComparing(new NameComparator())));
             }
-        } catch (SQLException e){
 
+            con.commit();
+        } catch (SQLException e){
+            if (con != null) con.rollback();
+            System.out.println(e.getMessage());
         }
     }
 
-    public void saveDoctorToDb(Doctor d) {
+    public void saveDoctorToDb(Doctor d) throws SQLException {
         String insert = "insert into doctors(name, specialist) values(?, ?)";
         String select = "select doctorId from doctors where name=? and specialist=? order by doctorId desc limit 1";
 
@@ -82,23 +85,27 @@ public class Hospital {
             ps2.setString(1, d.name);
             ps2.setString(2, d.specialist);
 
+            con.setAutoCommit(false);
             ResultSet rs = ps2.executeQuery();
 
             if (rs.next()) {
                 d.doctorId = rs.getInt("doctorId");
             }
 
+            con.commit();
         } catch (Exception e) {
+            if(con != null) con.rollback();
             System.out.println(e.getMessage());
         }
     }
 
 
-    public void loadPatientsFromDb(){
+    public void loadPatientsFromDb() throws SQLException {
         String query = "select * from patients";
 
         try {
             PreparedStatement preparedStatement = con.prepareStatement(query);
+            con.setAutoCommit(false);
             ResultSet rs = preparedStatement.executeQuery();
 
             while (rs.next()){
@@ -112,12 +119,15 @@ public class Hospital {
                     list.get(d).add(p);
                 }
             }
-        } catch (SQLException e){
 
+            con.commit();
+        } catch (SQLException e){
+            if(con != null) con.rollback();
+            System.out.println(e.getMessage());
         }
     }
 
-    public void savePatientDb(int doctorId, Patient p){
+    public void savePatientDb(int doctorId, Patient p) throws SQLException {
         String query = "insert into patients(doctorId, name, age, disease, priority) values(?, ?, ?, ?, ?)";
 
         try {
@@ -129,12 +139,15 @@ public class Hospital {
             preparedStatement.setString(4, p.disease);
             preparedStatement.setInt(5, p.priority);
 
+            con.setAutoCommit(false);
             int res = preparedStatement.executeUpdate();
 
             if(res == 0){
                 System.out.println("Error Inserting Patient");
             }
+            con.commit();
         } catch (Exception e){
+            if(con != null) con.rollback();
             System.out.println(e.getMessage());
         }
     }

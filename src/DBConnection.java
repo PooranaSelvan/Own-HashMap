@@ -8,7 +8,7 @@ public class DBConnection {
     private static final String PASSWORD = "poorana@zs27";
     private static Connection connection;
 
-    public static Connection makeConnection(){
+    public static Connection makeConnection() throws SQLException {
 
         if(connection == null){
             try {
@@ -22,6 +22,10 @@ public class DBConnection {
                 System.out.println("Non SQL Error!");
                 System.out.println(e.getStackTrace());
                 e.printStackTrace();
+            } finally {
+                if (connection != null){
+                    connection.close();
+                }
             }
         }
         return  connection;
