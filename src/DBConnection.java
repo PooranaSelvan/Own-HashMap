@@ -1,6 +1,8 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class DBConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/MyHashMap";
@@ -10,24 +12,11 @@ public class DBConnection {
 
     public static Connection makeConnection() throws SQLException {
 
-        if(connection == null){
-            try {
-                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        Logger logger = LogManager.getLogger("DBConnection");
 
-            } catch (SQLException e){
-                System.out.println("Connection Not Created!");
-                System.out.println(e.getStackTrace());
-                e.printStackTrace();
-            } catch (Exception e) {
-                System.out.println("Non SQL Error!");
-                System.out.println(e.getStackTrace());
-                e.printStackTrace();
-            } finally {
-                if (connection != null){
-                    connection.close();
-                }
-            }
-        }
-        return  connection;
+        Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        logger.info("Connected to Database!");
+        return connection;
+
     }
 }

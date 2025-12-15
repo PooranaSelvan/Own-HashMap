@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +10,7 @@ import java.util.PriorityQueue;
 public class Hospital {
     MyHashMap<Doctor, PriorityQueue<Patient>> list = new MyHashMap<>();
     Connection con = DBConnection.makeConnection();
+    private final Logger logger =  LogManager.getLogger("Hospital");
 
     Hospital() throws SQLException {
         loadDoctorsFromDb();
@@ -17,6 +21,8 @@ public class Hospital {
         saveDoctorToDb(d);
 
         list.put(d, new PriorityQueue<>(new PatientComparator().thenComparing(new NameComparator())));
+
+        logger.info("Added New Doctor! Name : ", d.name);
     }
 
     public void addPatient(Doctor d, Patient p) throws SQLException {
@@ -26,6 +32,8 @@ public class Hospital {
             patientList.add(p);
             savePatientDb(d.doctorId, p);
         }
+
+        logger.info("Added New Patient! Name : ", p.name);
     }
 
     public Doctor getDoctor(int id){
@@ -66,8 +74,9 @@ public class Hospital {
 
             con.commit();
         } catch (SQLException e){
-            if (con != null) con.rollback();
+            if (con != null && !con.isClosed()) con.rollback();
             System.out.println(e.getMessage());
+            logger.error("Failed to Load Doctors From Db!");
         }
     }
 
@@ -94,8 +103,9 @@ public class Hospital {
 
             con.commit();
         } catch (Exception e) {
-            if(con != null) con.rollback();
+            if(con != null && !con.isClosed()) con.rollback();
             System.out.println(e.getMessage());
+            logger.error("Failed to Save Doctors to Db!");
         }
     }
 
@@ -122,8 +132,9 @@ public class Hospital {
 
             con.commit();
         } catch (SQLException e){
-            if(con != null) con.rollback();
+            if(con != null && !con.isClosed()) con.rollback();
             System.out.println(e.getMessage());
+            logger.error("Failed to Get Patients from Db!");
         }
     }
 
@@ -147,8 +158,9 @@ public class Hospital {
             }
             con.commit();
         } catch (Exception e){
-            if(con != null) con.rollback();
+            if(con != null && !con.isClosed()) con.rollback();
             System.out.println(e.getMessage());
+            logger.error("Failed to Save Patients to Db!");
         }
     }
 }
